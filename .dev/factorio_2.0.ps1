@@ -1,6 +1,6 @@
 Set-Variable -Name workspace -Value $Env:FACTORIO_WORKSPACE
 Set-Variable -Name mod_base -Value $Env:FACTORIO_20_MODS_BASE
-Set-Variable -Name package -Value "###NAME###"
+Set-Variable -Name package -Value "khaosci-test"
 
 New-Item -ItemType Directory -Force -Path "$mod_base\$package" | Out-Null
 
