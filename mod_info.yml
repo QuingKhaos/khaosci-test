@@ -1,6 +1,6 @@
 mod_info:
   title: "QuingKhaos' CI Workflow Test Mod"
-  summary: "A test mod for testing GitHub actions workflows."
+  summary: "A test mod for testing GitHub Actions workflows."
   description_file: README.md
   attach_source_link: true
   license: unlicense
