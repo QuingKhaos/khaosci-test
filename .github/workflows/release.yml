@@ -13,7 +13,7 @@ permissions:
 jobs:
   release:
     name: Release mod
-    uses: QuingKhaos/khaosci/.github/workflows/release.yml@5884e70b35870f555fd2413860d5aa39f4f3c69a
+    uses: QuingKhaos/khaosci/.github/workflows/release.yml@feat/extract-changelog
     if: (github.event_name == 'push' && contains(github.event.head_commit.message, 'chore(release):')) || github.event_name == 'workflow_dispatch'
     with:
       mod-folder: .
