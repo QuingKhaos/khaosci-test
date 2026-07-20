@@ -1,0 +1,70 @@
+name: Release mod
+
+on:
+  push:
+    branches:
+      - "1.x"
+      - "2.x"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'push' && contains(github.event.head_commit.message, 'chore(release):')) || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout ${{ github.ref_name }}
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+          persist-credentials: false
+
+      - id: mod-name
+        name: Get mod name from info.json
+        run: echo "mod_name=$(jq -r '.name' ${{ github.workspace }}/info.json)" >> $GITHUB_OUTPUT
+
+      - id: mod-version
+        name: Get mod version from info.json
+        run: echo "mod_version=$(jq -r '.version' ${{ github.workspace }}/info.json)" >> $GITHUB_OUTPUT
+
+      - id: mod-exists
+        name: Check if mod version already exists on mod portal
+        run: response=$(curl --silent --output /dev/null --write-out "%{http_code}" "https://mods.factorio.com/api/mods/${{ steps.mod-name.outputs.mod_name }}"); echo "response=$response" >> $GITHUB_OUTPUT
+
+      - id: create-mod-package
+        name: Create mod package
+        uses: TheBrutalX/factorio-mod-uploader-action@v2
+        with:
+          action: compress
+          mod-name: ${{ steps.mod-name.outputs.mod_name }}
+          mod-folder: ${{ github.workspace }}
+          mod-version: ${{ steps.mod-version.outputs.mod_version }}
+          auto-update-version: false
+
+      - name: Release mod package
+        if: env.ZIP_FILE != ''
+        uses: softprops/action-gh-release@v3
+        with:
+          name: ${{ steps.mod-version.outputs.mod_version }}
+          tag_name: v${{ steps.mod-version.outputs.mod_version }}
+          target_commitish: ${{ github.ref }}
+          files: |
+            ${{ env.ZIP_FILE }}
+          fail_on_unmatched_files: true
+          make_latest: true
+
+      - name: Publish to mod portal
+        uses: TheBrutalX/factorio-mod-uploader-action@v2
+        env:
+          PROCESS_CREATE_ON_PORTAL: "${{ steps.mod-exists.outputs.response == 200 && 'false' || 'true' }}"
+        with:
+          action: upload
+          mod-name: ${{ steps.mod-name.outputs.mod_name }}
+          mod-folder: ${{ github.workspace }}
+          mod-version: ${{ steps.mod-version.outputs.mod_version }}
+          factorio-api-key: ${{ secrets.FACTORIO_API_KEY }}
+          skip-update-details: false
