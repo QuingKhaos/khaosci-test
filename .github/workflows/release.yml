@@ -13,9 +13,10 @@ permissions:
 jobs:
   release:
     name: Release mod
-    uses: QuingKhaos/khaosci/.github/workflows/release.yml@7e33e4736eea5b58fc09c045abe16f190f5bb73b
+    uses: QuingKhaos/khaosci/.github/workflows/release.yml@refactor/improvements
     if: (github.event_name == 'push' && contains(github.event.head_commit.message, 'chore(release):')) || github.event_name == 'workflow_dispatch'
     with:
+      lfs: false
       mod-folder: .
       skip-update-details: ${{ github.ref_name != '2.x' }}
     secrets:
