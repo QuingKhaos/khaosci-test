@@ -1,0 +1,12 @@
+name: Quality Assurance
+
+on:
+  pull_request:
+    branches:
+      - "1.x"
+      - "2.x"
+
+jobs:
+  qa:
+    name: QA
+    uses: QuingKhaos/khaosci/.github/workflows/qa.yml@refactor/improvements

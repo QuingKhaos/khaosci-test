@@ -1,4 +1,4 @@
-name: Release mod
+name: QA // Release
 
 on:
   push:
@@ -11,10 +11,15 @@ permissions:
   contents: write
 
 jobs:
+  qa:
+    name: QA
+    uses: QuingKhaos/khaosci/.github/workflows/qa.yml@refactor/improvements
+
   release:
     name: Release mod
     uses: QuingKhaos/khaosci/.github/workflows/release.yml@refactor/improvements
     if: (github.event_name == 'push' && contains(github.event.head_commit.message, 'chore(release):')) || github.event_name == 'workflow_dispatch'
+    needs: [qa]
     with:
       lfs: false
       mod-folder: .
